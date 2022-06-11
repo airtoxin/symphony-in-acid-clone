@@ -21,17 +21,33 @@ So long lives this, and this gives life to thee
 
 const elements: HTMLElement[] = [];
 
+const wordsMap = new Map<HTMLElement, HTMLElement[]>();
+
 const colors = ["blue", "red", "black", "gray"];
 for (const words of poetWordsLines) {
   for (const word of words) {
     const span = document.createElement("span");
-    span.innerText = word;
     span.style.margin = "0 0.1rem";
     span.style.lineHeight = "2rem";
+
+    const wordElements = word.split("").map(w => {
+      const wSpan = document.createElement("span");
+      wSpan.innerText = w;
+      span.appendChild(wSpan);
+      return wSpan;
+    });
+    wordsMap.set(span, wordElements);
+
     updateElement(span);
     app.appendChild(span);
     elements.push(span);
   }
+}
+
+function moveElement(el: HTMLElement) {
+  const width = 10 + Math.random() * 40;
+  el.style.width = `${width}rem`;
+  el.style.transform = `translate(min(${20 + Math.random() * 60}vw, calc(100vw - ${width}rem)), ${20 + Math.random() * 60}vh)`
 }
 
 function updateElement(el: HTMLElement) {
@@ -53,10 +69,12 @@ function updateElement(el: HTMLElement) {
 }
 
 setInterval(() => {
-  app.style.width = `${10 + Math.floor(Math.random() * 40)}rem`;
-  app.style.transform = `translate(${20 + Math.random() * 60}vw, ${20 + Math.random() * 60}vh)`
+  moveElement(app);
   for (const el of elements) {
     updateElement(el);
+    for (const w of wordsMap.get(el) ?? []) {
+      updateElement(w);
+    }
   }
 }, 3000);
 
